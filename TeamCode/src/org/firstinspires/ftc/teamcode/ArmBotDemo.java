@@ -56,7 +56,7 @@ public class ArmBotDemo extends LinearOpMode {
         imu.initialize(parameters);
 
         ColorSensor colorSensor = hardwareMap.colorSensor.get("color_sensor");
-        telemetry.addData("Press Start When Ready","");
+        telemetry.addData("Press Start Button When Ready","");
         telemetry.update();
 
         gamepad1.setJoystickDeadzone(0.05f);
