@@ -29,7 +29,7 @@ import virtual_robot.util.AngleUtils;
  */
 @Disabled
 @Autonomous(name = "mechbot auto demo", group = "Mechanum")
-public class MechBotAutoDemo extends LinearOpMode {
+public class MechBotAutoDemoRelicRecovery extends LinearOpMode {
 
     DcMotor m1, m2, m3, m4;
     //GyroSensor gyro;
