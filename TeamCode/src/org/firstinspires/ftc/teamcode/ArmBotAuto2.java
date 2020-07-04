@@ -39,7 +39,7 @@ public class ArmBotAuto2 extends LinearOpMode {
     private void logTwice(String sCaption, Object oToLog)
     {
         telemetry.addData(sCaption, oToLog);
-        System.out.println(sCaption + ": " + oToLog.toString());
+        System.out.print( oToLog.toString() + "\t");
     }
 
     public void runOpMode(){
@@ -103,20 +103,21 @@ public class ArmBotAuto2 extends LinearOpMode {
         etLocal.reset();
 
         int iState = 0;
-        // logTwice("Format", "Color\tHeading\tState\tLeft_Distance\tBack_Left\tFront_Left\tFront_Right\tBack_Right\tState_Time\tOpmode_Time");
+        System.out.println("Red\tGreen\tBlue\tHeading\tState\tLeft_Distance\tBack_Left\tFront_Left\tFront_Right\tBack_Right\tState_Time\tOpmode_Time");
 
         while (opModeIsActive()){
-            logTwice("Color", String.format("R %d  G %d  B %d", colorSensor.red(), colorSensor.green(), colorSensor.blue()));
+            logTwice("Color", String.format("%d\t%d\t%d", colorSensor.red(), colorSensor.green(), colorSensor.blue()));
             //telemetry.addData("Heading"," %.1f", gyro.getHeading());
             Orientation orientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
             double dDegrees = orientation.firstAngle * 180.0 / Math.PI;
             logTwice("Heading", String.format(" %.1f", dDegrees));
             logTwice("State", iState);
             logTwice("Left Distance", getDistance(leftDistance));
-            logTwice("Encoders",String.format(" %d %d %d %d", mtrBackLeft.getCurrentPosition(), mtrFrontLeft.getCurrentPosition(),
+            logTwice("Encoders",String.format(" %d\t%d\t%d\t%d", mtrBackLeft.getCurrentPosition(), mtrFrontLeft.getCurrentPosition(),
                     mtrFrontRight.getCurrentPosition(), mtrBackRight.getCurrentPosition()));
             logTwice("Local Runtime",  etLocal.seconds());
             logTwice("Op Mode Runtime",  etOpMode.seconds());
+            System.out.println("");
 
             telemetry.update();
 
@@ -135,6 +136,16 @@ public class ArmBotAuto2 extends LinearOpMode {
                     mtrBackLeft.setPower(0);
                     mtrFrontRight.setPower(0);
                     mtrBackRight.setPower(0);
+                    mtrBackLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    mtrFrontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    mtrFrontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    mtrBackRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+                    mtrBackLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    mtrFrontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    mtrFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    mtrBackRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
                     etLocal.reset();
                     iState++;
                 }
@@ -150,6 +161,7 @@ public class ArmBotAuto2 extends LinearOpMode {
                 }
                 else // blue line no longer detected; advance the state, but no need to stop
                 {
+                    etLocal.reset();
                     iState++;
                 }
             } // advancing forward until off the blue line
