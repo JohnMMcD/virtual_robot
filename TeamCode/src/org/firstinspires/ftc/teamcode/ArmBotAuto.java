@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -20,21 +21,20 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
  *
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
-@TeleOp(name = "arm bot auto", group = "ArmBot")
+@Autonomous(name = "arm bot auto", group = "ArmBot")
 public class ArmBotAuto extends LinearOpMode {
 
     private int BLUE_LINE_DETECTION = 200;
-    private int REVERSE_90_ENCODER = 6000;
+    private int REVERSE_90_ENCODER = 6800;
     private int MOVE_TO_CORNER = 8000;
+    private double DISTANCE_TO_WALL = 15.0;
     private ElapsedTime etLocal = new ElapsedTime();
     private ElapsedTime etOpMode = new ElapsedTime();
 
     private String getDistance(DistanceSensor sensor)
     {
-        String sTempDistance;
         double dRawDistance = sensor.getDistance(DistanceUnit.CM);
-        sTempDistance = dRawDistance < 815 ?  String.format("%f", dRawDistance) : "Undefined";
-        return sTempDistance;
+        return dRawDistance < 815 ?  String.format("%f", dRawDistance) : "Undefined";
     }
 
     public void runOpMode(){
@@ -101,10 +101,6 @@ public class ArmBotAuto extends LinearOpMode {
         int iState = 0;
 
         while (opModeIsActive()){
-            double p1;
-            double p2;
-            double p3;
-            double p4;
             telemetry.addData("Color","R %d  G %d  B %d", colorSensor.red(), colorSensor.green(), colorSensor.blue());
             //telemetry.addData("Heading"," %.1f", gyro.getHeading());
             Orientation orientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
@@ -121,9 +117,9 @@ public class ArmBotAuto extends LinearOpMode {
             telemetry.addData("Op Mode Runtime",  etOpMode.seconds());
             telemetry.update();
 
-            if (iState == 0) // Strafe left until the blue line is detected or distance is reached, then stop and advance the state
+            if (iState == 0) // Strafe left until the blue line is detected or distance to wall is reached, then stop and advance the state
             {
-                if (colorSensor.blue() < BLUE_LINE_DETECTION &&  leftDistance.getDistance(DistanceUnit.CM) > 10.0)
+                if (colorSensor.blue() < BLUE_LINE_DETECTION && leftDistance.getDistance(DistanceUnit.CM) > DISTANCE_TO_WALL)
                 {
                     mtrFrontLeft.setPower(-1.0);
                     mtrBackLeft.setPower(1.0);
@@ -139,15 +135,15 @@ public class ArmBotAuto extends LinearOpMode {
                     etLocal.reset();
                     iState++;
                 }
-            }
-            else if (iState == 1) // blue line was detected; advance forward until the blue line is no longer detected
+            } // strafe left until the blue line is detected or distance to wall is reached, then stop and advance the state
+            else if (iState == 1) // blue line was detected; advance forward at least 1.5 seconds until the blue line is no longer detected
             {
-                if (colorSensor.blue() > BLUE_LINE_DETECTION)
+                if (colorSensor.blue() > BLUE_LINE_DETECTION || etLocal.seconds() < 0.5)
                 {
-                    mtrFrontLeft.setPower(1.0);
-                    mtrBackLeft.setPower(1.0);
-                    mtrFrontRight.setPower(1.0);
-                    mtrBackRight.setPower(1.0);
+                    mtrFrontLeft.setPower(0.75);
+                    mtrBackLeft.setPower(0.75);
+                    mtrFrontRight.setPower(0.75);
+                    mtrBackRight.setPower(0.75);
                 }
                 else // blue line no longer detected; advance the state, but no need to stop
                 {
@@ -158,10 +154,10 @@ public class ArmBotAuto extends LinearOpMode {
             {
                 if (colorSensor.blue() < BLUE_LINE_DETECTION)
                 {
-                    mtrFrontLeft.setPower(1.0);
-                    mtrBackLeft.setPower(1.0);
-                    mtrFrontRight.setPower(1.0);
-                    mtrBackRight.setPower(1.0);
+                    mtrFrontLeft.setPower(0.75);
+                    mtrBackLeft.setPower(0.75);
+                    mtrFrontRight.setPower(0.75);
+                    mtrBackRight.setPower(0.75);
                 }
                 else
                 {
@@ -181,7 +177,7 @@ public class ArmBotAuto extends LinearOpMode {
                     iState++;
                 }
             } // moving forward to get platform
-            else if (iState == 3) // grab the platform and turn
+            else if (iState == 3) // grab the platform and turn // TODO: consider reversing for a bit just after grabbing the platform
             {
                 // TODO: lower servo
                 mtrFrontLeft.setPower(-0.90);
@@ -206,7 +202,7 @@ public class ArmBotAuto extends LinearOpMode {
                     etLocal.reset();
                     iState++;
                 }
-            }
+            } // end grabbing the platform and turning
             else if (iState == 4) // move with the platform to the corner
             {
                 mtrFrontLeft.setPower(1.0);
@@ -238,7 +234,7 @@ public class ArmBotAuto extends LinearOpMode {
                 mtrBackLeft.setPower(-0.20);
                 mtrFrontRight.setPower(-0.6);
                 mtrBackRight.setPower(-0.6);
-                if (etLocal.seconds() > 1.5 || dDegrees < 90.0 )
+                if ( dDegrees < 90.0 && etLocal.seconds() > 1.5 )
                 {
                     mtrFrontLeft.setPower(0);
                     mtrBackLeft.setPower(0);
