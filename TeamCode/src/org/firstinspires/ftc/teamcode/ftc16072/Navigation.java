@@ -10,8 +10,8 @@ import org.firstinspires.ftc.teamcode.ftc16072.Util.RobotPosition;
 
 
 public class Navigation {
-    static double DISTANCE_TOLARANCE = 2;
-    static double ANGLE_TOLARANCE = AngleUnit.RADIANS.fromDegrees(1);
+    static double DISTANCE_TOLERANCE = 2;
+    static double ANGLE_TOLERANCE = AngleUnit.RADIANS.fromDegrees(1);
     static double KP_DISTANCE = 0.02;
     static double KP_ANGLE = 1;
     MecanumDrive mecanumDrive = new MecanumDrive();
@@ -88,7 +88,7 @@ public class Navigation {
         double rotateSpeed = 0.0;
 
         double rotateDiff = angleUnit.toRadians(angle) - getHeading(AngleUnit.RADIANS);
-        if (Math.abs(rotateDiff) <= ANGLE_TOLARANCE) {
+        if (Math.abs(rotateDiff) <= ANGLE_TOLERANCE) {
             mecanumDrive.driveMecanum(0, 0, 0);
             return true;
         } else {
@@ -106,16 +106,16 @@ public class Navigation {
         double xSpeed = 0.0;
         double ySpeed = 0.0;
 
-        if ((Math.abs(xDiff) <= DISTANCE_TOLARANCE) &&
-                (Math.abs(yDiff) <= DISTANCE_TOLARANCE)) {
+        if ((Math.abs(xDiff) <= DISTANCE_TOLERANCE) &&
+                (Math.abs(yDiff) <= DISTANCE_TOLERANCE)) {
             mecanumDrive.driveMecanum(0, 0, 0);
             setPosition(distanceUnit.toCm(x), distanceUnit.toCm(y), DistanceUnit.CM);
             return true;
         }
-        if (Math.abs(xDiff) > DISTANCE_TOLARANCE) {
+        if (Math.abs(xDiff) > DISTANCE_TOLERANCE) {
             xSpeed = KP_DISTANCE * xDiff;
         }
-        if (Math.abs(yDiff) > DISTANCE_TOLARANCE) {
+        if (Math.abs(yDiff) > DISTANCE_TOLERANCE) {
             ySpeed = KP_DISTANCE * yDiff;
         }
         System.out.printf("Diff: %.02f %.02f\n", yDiff, xDiff);

@@ -24,6 +24,7 @@ public class MecanumAutoOpMode extends OpMode {
     public void loop() {
         telemetry.addData("X", robot.nav.getEstimatedPosition().getX(DistanceUnit.INCH));
         telemetry.addData("Y", robot.nav.getEstimatedPosition().getY(DistanceUnit.INCH));
+        telemetry.addData("Heading", robot.nav.getHeading(AngleUnit.DEGREES));
         telemetry.addData("state", state);
         switch (state) {
             case 0:
