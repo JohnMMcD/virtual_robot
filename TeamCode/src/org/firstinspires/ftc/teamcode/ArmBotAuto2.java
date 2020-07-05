@@ -36,6 +36,14 @@ public class ArmBotAuto2 extends LinearOpMode {
         double dRawDistance = sensor.getDistance(DistanceUnit.CM);
         return dRawDistance < 815 ?  String.format("%f", dRawDistance) : "Undefined";
     }
+
+    /**
+     * This is a drop-in replacement for telemetry.addData (sCaption, sStringToLog). However, it
+     * also logs the data to stdout with a following tab. This allows the output to be logged as
+     * tab-separated files. You will need to manually add a linefeed after each set of data.
+     * @param sCaption The caption to send to telemetry. Will not be output to the log file.
+     * @param oToLog The Object/data to log. Will be converted to a string.
+     */
     private void logTwice(String sCaption, Object oToLog)
     {
         telemetry.addData(sCaption, oToLog);
